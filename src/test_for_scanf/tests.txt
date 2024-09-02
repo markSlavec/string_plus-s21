@@ -1,0 +1,591 @@
+#test test_s21_sscanf_d
+int a, a1;
+short b, b1;
+long c, c1, d, d1, e, e1;
+a = b = c = d = 1;
+a1 = b1 = c1 = d1 = 1;
+const char str[] = "-12345 -000456000 111 +0005 666 777";
+ck_assert_int_eq(sscanf(str, "%3d %hd %ld %*d %ld %2ld", &a, &b, &c, &d, &e),
+                 s21_sscanf(str, "%3d %hd %ld %*d %ld %2ld", &a1, &b1, &c1, &d1, &e1));
+ck_assert_int_eq(a, a1);
+ck_assert_int_eq(b, b1);
+ck_assert_int_eq(c, c1);
+ck_assert_int_eq(d, d1);
+ck_assert_int_eq(e, e1);
+
+#test test_s21_sscanf_s_and_c
+char a[40] = {'\0'}, c[40] = {'\0'}, d[40] = {'\0'};
+wchar_t b[40] = {'\0'};
+char a2[40] = {'\0'}, c2[40] = {'\0'}, d2[40] = {'\0'};
+wchar_t b2[40] = {'\0'};
+const char str[] = "lol kek cheburek morzh pisos";
+ck_assert_int_eq(sscanf(str, "%s %ls %3c %*s %s", a, b, c, d),
+                 s21_sscanf(str, "%s %ls %3c %*s %s", a2, b2, c2, d2));
+ck_assert_str_eq(a, a2);
+ck_assert_str_eq(c, c2);
+ck_assert_str_eq(d, d2);
+
+#test test_s21_sscanf_x
+int a1, b1, c1, d1, a2, b2, c2, d2;
+a1 = a2 = b1 = b2 = c1 = c2 = d1 = d2 = 1;
+const char str[] = "1778 012 0x1111 -10 pisos";
+int r1 = sscanf(str, "%x%x%x%x", &a1, &b1, &c1, &d1);
+int r2 = s21_sscanf(str, "%x%x%x%x", &a2, &b2, &c2, &d2);
+ck_assert_int_eq(r1, r2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+#test test_s21_sscanf_i
+int a1, b1, c1, d1, a2, b2, c2, d2;
+a1 = a2 = b1 = b2 = c1 = c2 = d1 = d2 = 1;
+const char str[] = "1778 012 0x1Aa8 -10 pisos";
+int r1 = sscanf(str, "%i%i%i%i", &a1, &b1, &c1, &d1);
+int r2 = s21_sscanf(str, "%i%i%i%i", &a2, &b2, &c2, &d2);
+ck_assert_int_eq(r1, r2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+#test test_s21_sscanf_o
+int a1, b1, c1, d1, a2, b2, c2, d2;
+a1 = a2 = b1 = b2 = c1 = c2 = d1 = d2 = 1;
+const char str[] = "1775 012 0 -10 pisos";
+int r1 = sscanf(str, "%o%o%o%o", &a1, &b1, &c1, &d1);
+int r2 = s21_sscanf(str, "%o%o%o%o", &a2, &b2, &c2, &d2);
+ck_assert_int_eq(r1, r2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+#test test_s21_sscanf_p
+int integer = 5;
+int *p1a = &integer;
+int *p2a;
+int *p3a;
+char temp[50] = {'\0'};
+sprintf(temp, "%p", p1a);
+sscanf(temp, "%p", &p2a);
+s21_sscanf(temp, "%p", &p3a);
+ck_assert_ptr_eq(p2a, p3a);
+
+#test test_s21_sscanf_n_and_percent
+int a1, b1, c1, d1, a2, b2, c2, d2;
+a1 = a2 = b1 = b2 = c1 = c2 = d1 = d2 = 1;
+const char str[] = "-12345%    -000456000    111    0005 pisos";
+int r1 = s21_sscanf(str, "%d%% %d %n %d", &a1, &b1, &c1, &d1);
+int r2 = sscanf(str, "%d%% %d %n %d", &a2, &b2, &c2, &d2);
+ck_assert_int_eq(r1, r2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+#test test_s21_sscanf_f_and_e
+float a1, b1, a2, b2;
+double c1, c2;
+long double d1, d2;
+a1 = a2 = b1 = b2 = c1 = c2 = d1 = d2 = 1.1;
+const char str[] = "-12345.445 12.34e+07 -0.0 1234e-07 pisos";
+s21_sscanf(str, "%f%f%lf%Lf", &a1, &b1, &c1, &d1);
+sscanf(str, "%f%f%lf%Lf", &a2, &b2, &c2, &d2);
+ck_assert_float_eq(a1, a2);
+ck_assert_float_eq(b1, b2);
+ck_assert_float_eq(c1, c2);
+ck_assert_float_eq(d1, d2);
+
+#test test_s21_sscanf_u
+unsigned int a1, b1, a2, b2;
+unsigned short c1, c2;
+unsigned long d1, d2;
+a1 = a2 = b1 = b2 = c1 = c2 = d1 = d2 = 1;
+const char str[] = "0 0002 -1 -1234 666 pisos";
+int r1 = sscanf(str, "%*u%u%u%hu%lu", &a1, &b1, &c1, &d1);
+int r2 = s21_sscanf(str, "%*u%u%u%hu%lu", &a2, &b2, &c2, &d2);
+ck_assert_int_eq(r1, r2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+#test supertest_sscanf_imported
+int d1 = 0, d2 = 0, i1 = 0, i2 = 0, n1 = 0, n2 = 0, r1 = 0, r2 = 0;
+float e1 = 0, e2 = 0, E1 = 0, E2 = 0, f1 = 0, f2 = 0, g1 = 0, g2 = 0, G1 = 0,
+      G2 = 0;
+unsigned o1 = 0, o2 = 0, u1 = 0, u2 = 0, x1 = 0, x2 = 0, X1 = 0, X2 = 0;
+void *p1 = 0, *p2 = 0;
+char s1[100] = {0}, s2[100] = {0}, c1, c2, proc1[100] = {0}, proc2[100] = {0};
+short hi1 = 0, hi2 = 0, hd1 = 0, hd2 = 0;
+unsigned long lo1 = 0, lo2 = 0, lu1 = 0, lu2 = 0;
+long double Le1 = 0, Le2 = 0, LE1 = 0, LE2 = 0, Lg1 = 0, Lg2 = 0, LG1 = 0,
+            LG2 = 0;
+
+r1 = sscanf("4 123 amogus q 12e34 43e-21 13.37 2.28 1337.228",
+            "%i%d%9s%c%e%E%f%g%G", &i1, &d1, s1, &c1, &e1, &E1, &f1, &g1, &G1);
+r2 = s21_sscanf("4 123 amogus q 12e34 43e-21 13.37 2.28 1337.228",
+                "%i%d%9s%c%e%E%f%g%G", &i2, &d2, s2, &c2, &e2, &E2, &f2, &g2,
+                &G2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf("4 123 amogus q 12e34 43e+21 13.37 2.28 1337.228",
+            "%i%d%9s%c%e%E%f%g%G", &i1, &d1, s1, &c1, &e1, &E1, &f1, &g1, &G1);
+r2 = s21_sscanf("4 123 amogus q 12e34 43e+21 13.37 2.28 1337.228",
+                "%i%d%9s%c%e%E%f%g%G", &i2, &d2, s2, &c2, &e2, &E2, &f2, &g2,
+                &G2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101",
+            "%i%d%9s%c%e%E%f%g%G%o", &i1, &d1, s1, &c1, &e1, &E1, &f1, &g1, &G1,
+            &o1);
+r2 = s21_sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101",
+                "%i%d%9s%c%e%E%f%g%G%o", &i2, &d2, s2, &c2, &e2, &E2, &f2, &g2,
+                &G2, &o2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854",
+            "%i%d%9s%c%e%E%f%g%G%o%u", &i1, &d1, s1, &c1, &e1, &E1, &f1, &g1,
+            &G1, &o1, &u1);
+r2 = s21_sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854",
+                "%i%d%9s%c%e%E%f%g%G%o%u", &i2, &d2, s2, &c2, &e2, &E2, &f2,
+                &g2, &G2, &o2, &u2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab",
+            "%i%d%9s%c%e%E%f%g%G%o%u%x", &i1, &d1, s1, &c1, &e1, &E1, &f1, &g1,
+            &G1, &o1, &u1, &x1);
+r2 = s21_sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab",
+                "%i%d%9s%c%e%E%f%g%G%o%u%x", &i2, &d2, s2, &c2, &e2, &E2, &f2,
+                &g2, &G2, &o2, &u2, &x2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21",
+            "%i%d%9s%c%e%E%f%g%G%o%u%x%X", &i1, &d1, s1, &c1, &e1, &E1, &f1,
+            &g1, &G1, &o1, &u1, &x1, &X1);
+r2 = s21_sscanf(
+    "4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21",
+    "%i%d%9s%c%e%E%f%g%G%o%u%x%X", &i2, &d2, s2, &c2, &e2, &E2, &f2, &g2, &G2,
+    &o2, &u2, &x2, &X2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf("4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21",
+            "%i%d%9s%c%e%E%f%g%G%o%u%x%X%p1", &i1, &d1, s1, &c1, &e1, &E1, &f1,
+            &g1, &G1, &o1, &u1, &x1, &X1, &p1);
+r2 = s21_sscanf(
+    "4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21",
+    "%i%d%9s%c%e%E%f%g%G%o%u%x%X%p2", &i2, &d2, s2, &c2, &e2, &E2, &f2, &g2,
+    &G2, &o2, &u2, &x2, &X2, &p2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_ptr_eq(p1, p2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf(
+    "4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%i%d%9s%c%e%E%f%g%G%o%u%x%X%p%n%%", &i1, &d1, s1, &c1, &e1, &E1, &f1, &g1,
+    &G1, &o1, &u1, &x1, &X1, &p1, &n1);
+r2 = s21_sscanf(
+    "4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21",
+    "%i%d%9s%c%e%E%f%g%G%o%u%x%X%p%n%%", &i2, &d2, s2, &c2, &e2, &E2, &f2, &g2,
+    &G2, &o2, &u2, &x2, &X2, &p2, &n2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_ptr_eq(p1, p2);
+ck_assert_int_eq(n1, n2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf(
+    "4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%i%d%9s%c%e%E%f%g%G%o%u%x%X%p%n%9s%%", &i1, &d1, s1, &c1, &e1, &E1, &f1,
+    &g1, &G1, &o1, &u1, &x1, &X1, &p1, &n1, proc1);
+r2 = s21_sscanf(
+    "4 123 amogus q 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%i%d%9s%c%e%E%f%g%G%o%u%x%X%p%n%9s%%", &i2, &d2, s2, &c2, &e2, &E2, &f2,
+    &g2, &G2, &o2, &u2, &x2, &X2, &p2, &n2, proc2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_ptr_eq(p1, p2);
+ck_assert_int_eq(n1, n2);
+ck_assert_str_eq(proc1, proc2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf(
+    "4 123 amogusq 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%12i%4d%20s%c%3e%7E%1f%9g%5G%6o%12u%11x%2X%10p%n%21s%%", &i1, &d1, s1, &c1,
+    &e1, &E1, &f1, &g1, &G1, &o1, &u1, &x1, &X1, &p1, &n1, proc1);
+r2 = s21_sscanf(
+    "4 123 amogusq 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%12i%4d%20s%c%3e%7E%1f%9g%5G%6o%12u%11x%2X%10p%n%21s%%", &i2, &d2, s2, &c2,
+    &e2, &E2, &f2, &g2, &G2, &o2, &u2, &x2, &X2, &p2, &n2, proc2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg((int)E1 == (int)E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_ptr_eq(p1, p2);
+ck_assert_int_eq(n1, n2);
+ck_assert_str_eq(proc1, proc2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf(
+    "4 123 amogusq 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%12i%4d%20s%c%3e%7E%*i%1f%9g%5G%6o%12u%*x%11x%2X%10p%n%21s%%", &i1, &d1,
+    s1, &c1, &e1, &E1, &f1, &g1, &G1, &o1, &u1, &x1, &X1, &p1, &n1, proc1);
+r2 = s21_sscanf(
+    "4 123 amogusq 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%12i%4d%20s%c%3e%7E%*i%1f%9g%5G%6o%12u%*x%11x%2X%10p%n%21s%%", &i2, &d2,
+    s2, &c2, &e2, &E2, &f2, &g2, &G2, &o2, &u2, &x2, &X2, &p2, &n2, proc2);
+ck_assert_int_eq(i1, i2);
+ck_assert_int_eq(d1, d2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(o1, o2);
+ck_assert_int_eq(u1, u2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_ptr_eq(p1, p2);
+ck_assert_int_eq(n1, n2);
+ck_assert_str_eq(proc1, proc2);
+ck_assert_int_eq(r1, r2);
+
+r1 = sscanf(
+    "4 123 amogusq 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%*i%12hi%4hd%20s%c%3Le%7LE%*i%1f%9Lg%5LG%6lo%12lu%*x%11x%2X%10p%n%21s%"
+    "%",
+    &hi1, &hd1, s1, &c1, &Le1, &LE1, &f1, &Lg1, &LG1, &lo1, &lu1, &x1, &X1, &p1,
+    &n1, proc1);
+r2 = s21_sscanf(
+    "4 123 amogusq 12e34 43e21 13.37 2.28 1337.228 101 1854 12ab BA21 "
+    "shrek & "
+    "amogus is sus?",
+    "%*i%12hi%4hd%20s%c%3Le%7LE%*i%1f%9Lg%5LG%6lo%12lu%*x%11x%2X%10p%n%21s%"
+    "%",
+    &hi2, &hd2, s2, &c2, &Le2, &LE2, &f2, &Lg2, &LG2, &lo2, &lu2, &x2, &X2, &p2,
+    &n2, proc2);
+ck_assert_int_eq(hi1, hi2);
+ck_assert_int_eq(hd1, hd2);
+ck_assert_str_eq(s1, s2);
+ck_assert_int_eq(c1, c2);
+ck_assert_msg(e1 == e2, "floats not equals");
+ck_assert_msg(E1 == E2, "floats not equals");
+ck_assert_msg(f1 == f2, "floats not equals");
+ck_assert_msg(g1 == g2, "floats not equals");
+ck_assert_msg(G1 == G2, "floats not equals");
+ck_assert_int_eq(lo1, lo2);
+ck_assert_int_eq(lu1, lu2);
+ck_assert_int_eq(x1, x2);
+ck_assert_int_eq(X1, X2);
+ck_assert_ptr_eq(p1, p2);
+ck_assert_int_eq(n1, n2);
+ck_assert_str_eq(proc1, proc2);
+ck_assert_int_eq(r1, r2);
+
+
+
+
+///////
+
+
+
+
+
+#test test_sscanf_int
+int x, y;
+int result = s21_sscanf("123 456", "%d %d", &x, &y);
+ck_assert_int_eq(result, 2);
+ck_assert_int_eq(x, 123);
+ck_assert_int_eq(y, 456);
+
+
+#test test_sscanf_float
+float x, y;
+int result = s21_sscanf("3.14 -1.23", "%f %f", &x, &y);
+ck_assert_int_eq(result, 2);
+ck_assert_float_eq_tol(x, 3.14, 0.01);
+ck_assert_float_eq_tol(y, -1.23, 0.01);
+
+
+#test test_sscanf_string
+char x[20], y[20];
+int result = s21_sscanf("hello world", "%s %s", x, y);
+ck_assert_int_eq(result, 2);
+ck_assert_str_eq(x, "hello");
+ck_assert_str_eq(y, "world");
+
+
+#test test_sscanf_skip_whitespaces
+char x[20];
+int result = s21_sscanf(" abc ", "%s", x);
+ck_assert_int_eq(result, 1);
+ck_assert_str_eq(x, "abc");
+
+
+#test test_sscanf_mixed_type
+int x;
+float y;
+char z[20];
+int result = s21_sscanf("123 4.56 hello", "%d %f %s", &x, &y, z);
+ck_assert_int_eq(result, 3);
+ck_assert_int_eq(x, 123);
+ck_assert_float_eq_tol(y, 4.56, 0.01);
+ck_assert_str_eq(z, "hello");
+
+
+#test test_sscanf_width_specifier
+char x[20], y[20];
+int result = s21_sscanf("hello world", "%5s %5s", x, y);
+ck_assert_int_eq(result, 2);
+ck_assert_str_eq(x, "hello");
+ck_assert_str_eq(y, "world");
+
+
+#test test_sscanf_n_assignment
+int x, y;
+int result = s21_sscanf("123 456", "%d%n %d", &x, &y, &y);
+ck_assert_int_eq(result, 2);
+ck_assert_int_eq(x, 123);
+ck_assert_int_eq(y, 456);
+
+
+#test s21_sscanf_test_17_o_option
+uint32_t a1, a2;
+const char str[] = "          \n             \n     5";
+const char fstr[] = "%o";
+uint32_t res1 = s21_sscanf(str, fstr, &a1);
+uint32_t res2 = sscanf(str, fstr, &a2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+
+
+#test s21_sscanf_test_18_o_option
+uint16_t a1, a2;
+const char str[] = "12";
+const char fstr[] = "%ho";
+uint16_t res1 = s21_sscanf(str, fstr, &a1);
+uint16_t res2 = sscanf(str, fstr, &a2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+
+
+#test s21_sscanf_test_19_u_option
+unsigned short a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
+const char str[] = "-1337 +21 --5008 3000";
+const char fstr[] = "%hu %hu %hu %hu";
+
+int16_t res1 = s21_sscanf(str, fstr, &a1, &b1, &c1, &d1);
+int16_t res2 = sscanf(str, fstr, &a2, &b2, &c2, &d2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+
+#test test_sscanf_spec_i_int1
+long long a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
+const char str[] = "100 500 -600 +700";
+const char fstr[] = "%lli %lli %lli %lli";
+
+int16_t res1 = s21_sscanf(str, fstr, &a1, &b1, &c1, &d1);
+int16_t res2 = sscanf(str, fstr, &a2, &b2, &c2, &d2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+
+#test test_sscanf_spec_i_int2
+long long a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
+const char str[] = "100500-600+700 123";
+const char fstr[] = "%lli %lld %lld %lli";
+
+int16_t res1 = s21_sscanf(str, fstr, &a1, &b1, &c1, &d1);
+int16_t res2 = sscanf(str, fstr, &a2, &b2, &c2, &d2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+
+#test test_sscanf_spec_i_int3
+long long a1 = 0, a2 = 0, c1 = 0, c2 = 0;
+char b1 = 0, b2 = 0, d1 = 0, d2 = 0;
+const char str[] = "100500-600+700+400";
+const char fstr[] = "%lli%c%lli%c";
+
+int16_t res1 = s21_sscanf(str, fstr, &a1, &b1, &c1, &d1);
+int16_t res2 = sscanf(str, fstr, &a2, &b2, &c2, &d2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+
+#test test_sscanf_oct
+long long a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
+const char str[] = "  055555 0f 0f 0f5555555 0ddd   4    3    1 ";
+const char fstr[] = "%llo %lld %lld %lli";
+
+int16_t res1 = s21_sscanf(str, fstr, &a1, &b1, &c1, &d1);
+int16_t res2 = sscanf(str, fstr, &a2, &b2, &c2, &d2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+
+#test test_sscanf_hex
+long long a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
+const char str[] = " 63DD 0xf 0xf 0xf5555555 ddd   4    3    1 ";
+const char fstr[] = "%lli %lld %lld %lli";
+
+int16_t res1 = s21_sscanf(str, fstr, &a1, &b1, &c1, &d1);
+int16_t res2 = sscanf(str, fstr, &a2, &b2, &c2, &d2);
+
+ck_assert_int_eq(res1, res2);
+ck_assert_int_eq(a1, a2);
+ck_assert_int_eq(b1, b2);
+ck_assert_int_eq(c1, c2);
+ck_assert_int_eq(d1, d2);
+
+
+
